@@ -5,7 +5,11 @@ import path from "node:path";
 import { parseEnv } from "node:util";
 import { SITE } from "@aihot/industry/site";
 
-export const REPO_ROOT = path.resolve(import.meta.dirname, "../../..");
+/**
+ * Where the industry pack, assets and seeds are read from at run time. A bundled deployment (Vercel,
+ * vercel/) sets AIHOT_REPO_ROOT to the directory the files were copied to.
+ */
+export const REPO_ROOT = process.env.AIHOT_REPO_ROOT || path.resolve(import.meta.dirname, "../../..");
 
 const env = process.env;
 

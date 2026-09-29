@@ -1,5 +1,5 @@
 {
-  "$comment": "示范信源：首次启动时导入（scripts/seed.ts），已存在的不会被覆盖。之后在后台“信源”里增删改。字段说明见 docs/customize.md。",
+  "$comment": "EvalHot 初始信源：首次启动时导入（scripts/seed.ts），已存在的不会被覆盖。之后在后台“信源”里增删改。字段说明见 docs/customize.md。每个网址都在 2026-09-29 实际请求验证过；X 上的评测账号（Arena、Artificial Analysis 等）通过 AIHOT 间接获取，不单独接 SocialData。aihot-all 读 aihot.news 公开 API：原文链接作为网址（与直接抓到的同一篇判重），signal_group_id 让它在热度里只算一个参与者；组织内部使用免费，对外公开前需按 https://aihot.news/terms 取得书面授权。",
   "sources": [
     {
       "id": "rss-openai-news",
@@ -15,9 +15,40 @@
       "first_party": true,
       "owner_entity_id": "openai",
       "participation_mode": "editorial",
-      "interval_minutes": 120,
+      "interval_minutes": 60,
       "tags": [
-        "官方"
+        "官方",
+        "模型厂商"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "web-anthropic-news",
+      "name": "Anthropic News",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.anthropic.com/news",
+        "baseUrl": "https://www.anthropic.com",
+        "itemSelector": "a[href^=\"/news/\"][class*=\"listItem\"], a[class*=\"FeaturedGrid\"]",
+        "titleSelector": "[class*=\"featuredTitle\"], [class*=\"__title\"]",
+        "publishedAtSelector": "time",
+        "allowUrlPrefixes": [
+          "https://www.anthropic.com/news/",
+          "https://www.anthropic.com/claude-"
+        ],
+        "_aihot": {
+          "initialBackfillLimit": 8
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "anthropic",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "tags": [
+        "官方",
+        "模型厂商"
       ],
       "site_fulltext": false,
       "syndicate_fulltext": false
@@ -36,19 +67,20 @@
       "first_party": true,
       "owner_entity_id": "google",
       "participation_mode": "editorial",
-      "interval_minutes": 120,
+      "interval_minutes": 60,
       "tags": [
-        "官方"
+        "官方",
+        "模型厂商"
       ],
       "site_fulltext": false,
       "syndicate_fulltext": false
     },
     {
-      "id": "rss-google-research",
-      "name": "Google Research",
+      "id": "rss-google-ai",
+      "name": "Google Blog · AI",
       "kind": "rss",
       "config": {
-        "feedUrl": "https://research.google/blog/rss/",
+        "feedUrl": "https://blog.google/technology/ai/rss/",
         "_aihot": {
           "initialBackfillLimit": 8
         }
@@ -60,115 +92,7 @@
       "interval_minutes": 120,
       "tags": [
         "官方",
-        "研究"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-hugging-face",
-      "name": "Hugging Face Blog",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://huggingface.co/blog/feed.xml",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "first_party": true,
-      "owner_entity_id": "hugging-face",
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "官方",
-        "开源"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-microsoft-research",
-      "name": "Microsoft Research",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://www.microsoft.com/en-us/research/feed/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "first_party": true,
-      "owner_entity_id": "microsoft",
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "官方",
-        "研究"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-nvidia-blog",
-      "name": "NVIDIA Blog",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://blogs.nvidia.com/feed/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "first_party": true,
-      "owner_entity_id": "nvidia",
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "官方"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-aws-ml",
-      "name": "AWS Machine Learning Blog",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://aws.amazon.com/blogs/machine-learning/feed/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "first_party": true,
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "官方",
-        "教程"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-github-ai",
-      "name": "GitHub Blog · AI & ML",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://github.blog/ai-and-ml/feed/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T1",
-      "first_party": true,
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 120,
-      "tags": [
-        "官方"
+        "模型厂商"
       ],
       "site_fulltext": false,
       "syndicate_fulltext": false
@@ -185,7 +109,259 @@
       },
       "tier": "T1",
       "first_party": true,
-      "owner_entity_id": null,
+      "owner_entity_id": "mistral",
+      "participation_mode": "editorial",
+      "interval_minutes": 120,
+      "tags": [
+        "官方",
+        "模型厂商"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "hf-models-deepseek-ai",
+      "name": "Hugging Face · DeepSeek 新模型",
+      "kind": "json_list",
+      "config": {
+        "url": "https://huggingface.co/api/models?author=deepseek-ai&sort=createdAt&direction=-1&limit=20&expand[]=lastModified",
+        "titlePaths": [
+          "id"
+        ],
+        "externalIdPath": "id",
+        "urlTemplate": "https://huggingface.co/{raw:id}",
+        "ingestNoiseFilter": {
+          "dropMarkersTitleOnly": [
+            "-bf16",
+            "-fp8",
+            "-fp4",
+            "-mxfp8",
+            "-mxfp4",
+            "-nvfp4",
+            "-int4",
+            "-int8",
+            "-awq",
+            "-gptq",
+            "-gguf",
+            "-eagle",
+            "-mlx",
+            "-onnx"
+          ]
+        },
+        "_aihot": {
+          "initialBackfillLimit": 5
+        },
+        "publishedAtPath": "lastModified"
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "deepseek",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "tags": [
+        "官方",
+        "开放权重"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "hf-models-qwen",
+      "name": "Hugging Face · Qwen 新模型",
+      "kind": "json_list",
+      "config": {
+        "url": "https://huggingface.co/api/models?author=Qwen&sort=createdAt&direction=-1&limit=20&expand[]=lastModified",
+        "titlePaths": [
+          "id"
+        ],
+        "externalIdPath": "id",
+        "urlTemplate": "https://huggingface.co/{raw:id}",
+        "ingestNoiseFilter": {
+          "dropMarkersTitleOnly": [
+            "-bf16",
+            "-fp8",
+            "-fp4",
+            "-mxfp8",
+            "-mxfp4",
+            "-nvfp4",
+            "-int4",
+            "-int8",
+            "-awq",
+            "-gptq",
+            "-gguf",
+            "-eagle",
+            "-mlx",
+            "-onnx"
+          ]
+        },
+        "_aihot": {
+          "initialBackfillLimit": 5
+        },
+        "publishedAtPath": "lastModified"
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "qwen",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "tags": [
+        "官方",
+        "开放权重"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "hf-models-moonshotai",
+      "name": "Hugging Face · Kimi 新模型",
+      "kind": "json_list",
+      "config": {
+        "url": "https://huggingface.co/api/models?author=moonshotai&sort=createdAt&direction=-1&limit=20&expand[]=lastModified",
+        "titlePaths": [
+          "id"
+        ],
+        "externalIdPath": "id",
+        "urlTemplate": "https://huggingface.co/{raw:id}",
+        "ingestNoiseFilter": {
+          "dropMarkersTitleOnly": [
+            "-bf16",
+            "-fp8",
+            "-fp4",
+            "-mxfp8",
+            "-mxfp4",
+            "-nvfp4",
+            "-int4",
+            "-int8",
+            "-awq",
+            "-gptq",
+            "-gguf",
+            "-eagle",
+            "-mlx",
+            "-onnx"
+          ]
+        },
+        "_aihot": {
+          "initialBackfillLimit": 5
+        },
+        "publishedAtPath": "lastModified"
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "kimi",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "tags": [
+        "官方",
+        "开放权重"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "hf-models-zai-org",
+      "name": "Hugging Face · 智谱 GLM 新模型",
+      "kind": "json_list",
+      "config": {
+        "url": "https://huggingface.co/api/models?author=zai-org&sort=createdAt&direction=-1&limit=20&expand[]=lastModified",
+        "titlePaths": [
+          "id"
+        ],
+        "externalIdPath": "id",
+        "urlTemplate": "https://huggingface.co/{raw:id}",
+        "ingestNoiseFilter": {
+          "dropMarkersTitleOnly": [
+            "-bf16",
+            "-fp8",
+            "-fp4",
+            "-mxfp8",
+            "-mxfp4",
+            "-nvfp4",
+            "-int4",
+            "-int8",
+            "-awq",
+            "-gptq",
+            "-gguf",
+            "-eagle",
+            "-mlx",
+            "-onnx"
+          ]
+        },
+        "_aihot": {
+          "initialBackfillLimit": 5
+        },
+        "publishedAtPath": "lastModified"
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "zhipu",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "tags": [
+        "官方",
+        "开放权重"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "hf-models-minimaxai",
+      "name": "Hugging Face · MiniMax 新模型",
+      "kind": "json_list",
+      "config": {
+        "url": "https://huggingface.co/api/models?author=MiniMaxAI&sort=createdAt&direction=-1&limit=20&expand[]=lastModified",
+        "titlePaths": [
+          "id"
+        ],
+        "externalIdPath": "id",
+        "urlTemplate": "https://huggingface.co/{raw:id}",
+        "ingestNoiseFilter": {
+          "dropMarkersTitleOnly": [
+            "-bf16",
+            "-fp8",
+            "-fp4",
+            "-mxfp8",
+            "-mxfp4",
+            "-nvfp4",
+            "-int4",
+            "-int8",
+            "-awq",
+            "-gptq",
+            "-gguf",
+            "-eagle",
+            "-mlx",
+            "-onnx"
+          ]
+        },
+        "_aihot": {
+          "initialBackfillLimit": 5
+        },
+        "publishedAtPath": "lastModified"
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "minimax",
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "tags": [
+        "官方",
+        "开放权重"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "rss-hugging-face-blog",
+      "name": "Hugging Face Blog",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://huggingface.co/blog/feed.xml",
+        "_aihot": {
+          "initialBackfillLimit": 8
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "hugging-face",
       "participation_mode": "editorial",
       "interval_minutes": 120,
       "tags": [
@@ -195,11 +371,61 @@
       "syndicate_fulltext": false
     },
     {
-      "id": "rss-bair",
-      "name": "Berkeley AI Research",
+      "id": "rss-epoch-ai",
+      "name": "Epoch AI",
       "kind": "rss",
       "config": {
-        "feedUrl": "https://bair.berkeley.edu/blog/feed.xml",
+        "feedUrl": "https://epochai.substack.com/feed",
+        "_aihot": {
+          "initialBackfillLimit": 8
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "epoch",
+      "participation_mode": "editorial",
+      "interval_minutes": 120,
+      "tags": [
+        "评测机构"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "web-metr-blog",
+      "name": "METR",
+      "kind": "web_list",
+      "config": {
+        "url": "https://metr.org/blog/",
+        "baseUrl": "https://metr.org",
+        "itemSelector": ".blog-post-card",
+        "linkSelector": "a[href^='/blog/']",
+        "titleSelector": ".card-title",
+        "publishedAtSelector": ".card-date",
+        "allowUrlPrefixes": [
+          "https://metr.org/blog/"
+        ],
+        "_aihot": {
+          "initialBackfillLimit": 8
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": "metr",
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "评测机构"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "rss-stanford-crfm",
+      "name": "Stanford CRFM（HELM）",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://crfm.stanford.edu/feed.xml",
         "_aihot": {
           "initialBackfillLimit": 8
         }
@@ -210,122 +436,180 @@
       "participation_mode": "editorial",
       "interval_minutes": 180,
       "tags": [
-        "研究"
+        "评测机构"
       ],
       "site_fulltext": false,
       "syndicate_fulltext": false
     },
     {
-      "id": "rss-the-verge-ai",
-      "name": "The Verge · AI",
+      "id": "arxiv-cl-eval",
+      "name": "arXiv · cs.CL 评测与基准",
       "kind": "rss",
       "config": {
-        "feedUrl": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml",
+        "feedUrl": "https://export.arxiv.org/api/query?search_query=cat:cs.CL+AND+(ti:benchmark+OR+ti:evaluation+OR+ti:leaderboard)&sortBy=submittedDate&sortOrder=descending&max_results=30",
+        "itemUrlPrefixRewrite": {
+          "from": "http://arxiv.org/abs/",
+          "to": "https://arxiv.org/abs/"
+        },
         "_aihot": {
-          "initialBackfillLimit": 8
+          "initialBackfillLimit": 10
         }
       },
-      "tier": "T2",
-      "first_party": false,
+      "tier": "T1_5",
+      "first_party": true,
       "owner_entity_id": null,
       "participation_mode": "editorial",
-      "interval_minutes": 60,
+      "interval_minutes": 180,
       "tags": [
-        "媒体"
+        "论文"
       ],
       "site_fulltext": false,
       "syndicate_fulltext": false
     },
     {
-      "id": "rss-techcrunch-ai",
-      "name": "TechCrunch · AI",
-      "kind": "rss",
+      "id": "hf-daily-papers",
+      "name": "Hugging Face Daily Papers",
+      "kind": "json_list",
       "config": {
-        "feedUrl": "https://techcrunch.com/category/artificial-intelligence/feed/",
+        "url": "https://huggingface.co/api/daily_papers",
+        "titlePaths": [
+          "title",
+          "paper.title"
+        ],
+        "summaryPaths": [
+          "summary",
+          "paper.summary"
+        ],
+        "summaryIsBody": true,
+        "publishedAtPath": "publishedAt",
+        "externalIdPath": "paper.id",
+        "urlTemplate": "https://arxiv.org/abs/{raw:paper.id}",
         "_aihot": {
-          "initialBackfillLimit": 8
+          "initialBackfillLimit": 10
         }
       },
-      "tier": "T2",
-      "first_party": false,
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 60,
-      "tags": [
-        "媒体"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-ars-technica-ai",
-      "name": "Ars Technica · AI",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://arstechnica.com/ai/feed/",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T2",
-      "first_party": false,
-      "owner_entity_id": null,
-      "participation_mode": "editorial",
-      "interval_minutes": 60,
-      "tags": [
-        "媒体"
-      ],
-      "site_fulltext": false,
-      "syndicate_fulltext": false
-    },
-    {
-      "id": "rss-mit-tech-review-ai",
-      "name": "MIT Technology Review · AI",
-      "kind": "rss",
-      "config": {
-        "feedUrl": "https://www.technologyreview.com/topic/artificial-intelligence/feed",
-        "_aihot": {
-          "initialBackfillLimit": 8
-        }
-      },
-      "tier": "T2",
-      "first_party": false,
+      "tier": "T1_5",
+      "first_party": true,
       "owner_entity_id": null,
       "participation_mode": "editorial",
       "interval_minutes": 120,
       "tags": [
-        "媒体"
+        "论文"
       ],
       "site_fulltext": false,
       "syndicate_fulltext": false
     },
     {
-      "id": "rss-the-decoder",
-      "name": "The Decoder",
+      "id": "gh-lm-evaluation-harness-releases",
+      "name": "lm-evaluation-harness：GitHub Releases",
       "kind": "rss",
       "config": {
-        "feedUrl": "https://the-decoder.com/feed/",
+        "feedUrl": "https://github.com/EleutherAI/lm-evaluation-harness/releases.atom",
         "_aihot": {
-          "initialBackfillLimit": 8
+          "initialBackfillLimit": 3
         }
       },
-      "tier": "T2",
-      "first_party": false,
+      "tier": "T1",
+      "first_party": true,
       "owner_entity_id": null,
       "participation_mode": "editorial",
-      "interval_minutes": 60,
+      "interval_minutes": 180,
       "tags": [
-        "媒体"
+        "评测工具"
       ],
       "site_fulltext": false,
       "syndicate_fulltext": false
     },
     {
-      "id": "rss-simon-willison",
-      "name": "Simon Willison",
+      "id": "gh-inspect_ai-releases",
+      "name": "Inspect：GitHub Releases",
       "kind": "rss",
       "config": {
-        "feedUrl": "https://simonwillison.net/atom/everything/",
+        "feedUrl": "https://github.com/UKGovernmentBEIS/inspect_ai/releases.atom",
+        "_aihot": {
+          "initialBackfillLimit": 3
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "评测工具"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "gh-opencompass-releases",
+      "name": "OpenCompass：GitHub Releases",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://github.com/open-compass/opencompass/releases.atom",
+        "_aihot": {
+          "initialBackfillLimit": 3
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "评测工具"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "gh-helm-releases",
+      "name": "HELM：GitHub Releases",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://github.com/stanford-crfm/helm/releases.atom",
+        "_aihot": {
+          "initialBackfillLimit": 3
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "评测工具"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "gh-swe-bench-releases",
+      "name": "SWE-bench：GitHub Releases",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://github.com/SWE-bench/SWE-bench/releases.atom",
+        "_aihot": {
+          "initialBackfillLimit": 3
+        }
+      },
+      "tier": "T1",
+      "first_party": true,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 180,
+      "tags": [
+        "评测工具"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "rss-interconnects",
+      "name": "Interconnects（Nathan Lambert）",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.interconnects.ai/feed",
         "_aihot": {
           "initialBackfillLimit": 8
         }
@@ -334,7 +618,7 @@
       "first_party": false,
       "owner_entity_id": null,
       "participation_mode": "editorial",
-      "interval_minutes": 120,
+      "interval_minutes": 180,
       "tags": [
         "个人"
       ],
@@ -383,6 +667,82 @@
       ],
       "site_fulltext": false,
       "syndicate_fulltext": false
+    },
+    {
+      "id": "rss-simon-willison",
+      "name": "Simon Willison",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://simonwillison.net/atom/everything/",
+        "_aihot": {
+          "initialBackfillLimit": 8
+        }
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 120,
+      "tags": [
+        "个人"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "rss-qbitai",
+      "name": "量子位",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://www.qbitai.com/feed",
+        "_aihot": {
+          "initialBackfillLimit": 8
+        }
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "tags": [
+        "媒体"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "aihot-all",
+      "name": "AIHOT · 全部动态",
+      "kind": "json_list",
+      "config": {
+        "url": "https://aihot.news/api/v1/items?mode=all&window=24h&limit=100",
+        "itemsPath": "items",
+        "titlePaths": [
+          "originalTitle",
+          "title"
+        ],
+        "summaryPaths": [
+          "summary"
+        ],
+        "publishedAtPath": "publishedAt",
+        "externalIdPath": "id",
+        "urlTemplate": "{raw:links.original}",
+        "_aihot": {
+          "initialBackfillLimit": 30
+        }
+      },
+      "tier": "T2",
+      "first_party": false,
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 30,
+      "tags": [
+        "聚合",
+        "二级信源"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false,
+      "signal_group_id": "aihot"
     }
   ]
 }

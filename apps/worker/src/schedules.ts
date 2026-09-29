@@ -34,6 +34,11 @@ interface Scheduled {
 }
 
 const collecting = process.env.COLLECT_ENABLED !== "false";
+/**
+ * A worker that runs only part of the time (a scheduled CI job, docs/evalhot.md) sets SCHEDULE_MISSED=once:
+ * a slot that passed while no worker was running is run once when the next one starts.
+ */
+const MISSED_DEFAULT: "skip" | "once" = process.env.SCHEDULE_MISSED === "once" ? "once" : "skip";
 
 export const SCHEDULES: Scheduled[] = [
   { name: "content.sweep", cron: "*/5 * * * *", run: sweepUnprocessed },
@@ -100,7 +105,7 @@ export async function registerSchedules(boss: PgBoss) {
   for (const s of SCHEDULES) {
     const queue = `cron.${s.name}`;
     await ensureQueue(queue, { policy: "singleton", retryLimit: 1, expireInSeconds: 3600 });
-    await boss.schedule(queue, s.cron, {}, { tz: "Asia/Shanghai", missed: s.missed ?? "skip" });
+    await boss.schedule(queue, s.cron, {}, { tz: "Asia/Shanghai", missed: s.missed ?? MISSED_DEFAULT });
     // Schedules fire at minute boundaries; a 15 s pickup keeps them on time with a third of the polling.
     await boss.work(queue, { pollingIntervalSeconds: 15 }, async () => recordRun(s.name, s.run));
   }

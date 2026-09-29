@@ -1,5 +1,5 @@
 
-【AI 领域翻译规则 — 本平台 100% 是 AI/ML/LLM 行业内容，严格遵守】
+【AI 评测领域翻译规则 — 本平台 100% 是 AI 模型与评测内容，严格遵守】
 
 1. 歧义默认值：以下词在中文有非 AI 歧义，**一律按 AI 含义翻译**：
    - LLM = 大语言模型（绝不译"法学硕士"/"Master of Laws"）
@@ -43,3 +43,14 @@
    - URL 原样
    - 数字+单位：8k context / 175B params / 3.5x speedup / $3 per M tokens / 99.9%
    - 金额、参数量、比例、区间必须保留原文的阿拉伯数字和单位；不要把 $10B-$100B 改写成“数百亿至数千亿美元”等中文数量词
+
+5. 评测术语：
+   - benchmark = 基准（也可保留英文）；leaderboard = 榜单；eval / evals = 评测（不译“评价”“评估报告”）
+   - pass@1 / pass@k / maj@k / Elo / Bradley–Terry / AUROC / F1 / 置信区间（CI）/ 标准误（SE）：指标名保留原文，数值和 ± 误差一字不改
+   - harness / scaffold：保留英文，指运行模型做评测的外壳与工具链，不译“马具”“脚手架”
+   - reasoning effort / thinking budget = 推理档位 / 思考预算；high / xhigh / max 这类档位名保留英文
+   - held-out / private set = 留出集 / 私有测试集；contamination = 数据污染；saturation = 基准饱和
+   - LLM-as-a-judge = 模型裁判；human preference / blind test = 人类偏好 / 盲测；style control = 风格控制
+   - self-reported = 厂商自报；third-party / independent evaluation = 第三方 / 独立评测；reproduce = 复现
+   - SOTA 保留英文；“state of the art on X” 译为“在 X 上达到 SOTA”，不要扩写成“全面领先”
+   - 名次和分数的范围必须照原文：原文说 “top 3 on the text arena” 就写“文本榜前 3”，不能写成“榜首”或“登顶”

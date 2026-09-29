@@ -1,3 +1,4 @@
+import { pathToFileURL } from "node:url";
 import { Worker } from "node:worker_threads";
 import type { BoardInput, BoardOutput } from "./v15.ts";
 
@@ -10,7 +11,9 @@ export interface ComputedBoards {
  * original order, with the exact v15 inputs, solver limits and tie policy, in one bounded worker. */
 export function computeBoardsInWorker(boards: BoardInput[]): Promise<ComputedBoards> {
   return new Promise((resolve, reject) => {
-    const worker = new Worker(new URL("./compute-worker.ts", import.meta.url), { workerData: boards });
+    // A bundled deployment (vercel/) ships the worker as its own file next to the bundle.
+    const script = process.env.AIHOT_LB_WORKER_FILE ? pathToFileURL(process.env.AIHOT_LB_WORKER_FILE) : new URL("./compute-worker.ts", import.meta.url);
+    const worker = new Worker(script, { workerData: boards });
     let result: ComputedBoards | undefined;
     worker.once("message", (value: ComputedBoards) => { result = value; });
     worker.once("error", reject);

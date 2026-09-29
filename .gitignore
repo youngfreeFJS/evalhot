@@ -11,6 +11,9 @@ dist/
 apps/web/build/
 apps/web/.react-router/
 
+# Vercel build output (scripts/vercel-build.ts) and project link
+.vercel/
+
 # Font package unpacked to regenerate the report nameplates (docs/customize.md)
 package/
 fontsource-noto-sans-sc-*.tgz

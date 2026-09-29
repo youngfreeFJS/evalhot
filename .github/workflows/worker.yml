@@ -1,0 +1,79 @@
+# EvalHot worker (docs/evalhot.md). Every 10 minutes a GitHub-hosted runner runs the worker
+# (apps/worker/src/main.ts) against the production database: it takes new work for WORKER_RUN_SECONDS,
+# then SIGTERM lets it finish what it holds (up to 195 s, so a paid call in flight completes), and the run
+# records itself in .github/worker-version.json. The website runs on Vercel on the same database.
+# Scheduled runs may start late or be dropped under load; slots a run missed are caught up once
+# (SCHEDULE_MISSED=once). Only GitHub-owned actions, pinned to a full commit SHA.
+name: Worker
+
+on:
+  schedule:
+    # Every 10 minutes, off the start of the hour (when GitHub delays scheduled runs the most).
+    - cron: "3-59/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# One run at a time: a run that comes due while another is going waits for it.
+concurrency:
+  group: worker
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NODE_ENV: production
+      SCHEDULE_MISSED: once
+      WORKER_RUN_SECONDS: "360"
+      COLLECT_ENABLED: "true"
+      MODEL_CALLS_ENABLED: "true"
+      # Neon's direct (unpooled) connection string: prepared statements need a session.
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SITE_URL: ${{ secrets.SITE_URL }}
+      IMG_PROXY_SIGN_SECRET: ${{ secrets.IMG_PROXY_SIGN_SECRET }}
+      LLM_BASE_URL: ${{ secrets.LLM_BASE_URL }}
+      LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
+      LLM_MODEL: ${{ secrets.LLM_MODEL }}
+      LLM_EXTRA_JSON: ${{ secrets.LLM_EXTRA_JSON }}
+      DASHSCOPE_API_KEY: ${{ secrets.DASHSCOPE_API_KEY }}
+      DASHSCOPE_BASE_URL: ${{ secrets.DASHSCOPE_BASE_URL }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+      - name: Migrate
+        # Already applied migrations are skipped; the Vercel production build runs the same.
+        run: node scripts/migrate.ts
+      - name: Worker
+        # GNU timeout sends SIGTERM after the run and SIGKILL 240 s later; 124 means it stopped on time.
+        run: |
+          export AIHOT_DATA_DIR="$RUNNER_TEMP/evalhot-data"
+          mkdir -p "$AIHOT_DATA_DIR"
+          timeout --signal=TERM --kill-after=240 "$WORKER_RUN_SECONDS" node apps/worker/src/main.ts || [ $? -eq 124 ]
+
+      - name: Record the run
+        # Also after a failed run: the commit keeps the repository active, so GitHub does not switch the
+        # schedule off. Vercel skips builds for commits that change only this file (vercel.json).
+        if: always()
+        env:
+          RUN_NUMBER: ${{ github.run_number }}
+          STATUS: ${{ job.status }}
+        run: |
+          printf '{\n  "version": %s,\n  "ranAt": "%s",\n  "status": "%s"\n}\n' "$RUN_NUMBER" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$STATUS" > .github/worker-version.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/worker-version.json
+          git commit --quiet -m "chore(worker): run $RUN_NUMBER [skip ci]"
+          for attempt in 1 2 3; do
+            git pull --rebase --quiet && git push --quiet && exit 0
+            sleep 5
+          done
+          exit 1
