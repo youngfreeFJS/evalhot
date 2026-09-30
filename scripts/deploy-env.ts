@@ -9,7 +9,9 @@
 // machine (.gitignore: .env.*).
 import { execFileSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { parseEnv } from "node:util";
 
 const FILE = ".env.deploy";
@@ -37,8 +39,8 @@ if (!target) {
 # ===== 需要你填 =====
 # 站点地址：Vercel 项目的生产地址，比如 https://evalhot.vercel.app（链接、RSS、分享图、MCP 都用它）
 SITE_URL=
-# 数据库：Vercel 项目 → Storage → Neon → 复制 DATABASE_URL_UNPOOLED（直连地址）。只给 worker 用，
-# Vercel 上由 Neon 集成自动注入，不会上传过去。
+# 数据库：只给 worker 用（Vercel 上由 Neon 集成自动注入，不会上传过去）。留空时 --github 会从已关联的
+# Vercel 项目取 Neon 的直连地址（DATABASE_URL_UNPOOLED）。
 DATABASE_URL=
 # 模型：任何 OpenAI 兼容接口。下面是阿里云百炼的写法；国际站的 key 把域名换成 dashscope-intl.aliyuncs.com
 LLM_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1
@@ -69,6 +71,20 @@ DATABASE_POOL_MAX=5
 }
 
 const all = Object.entries(parseEnv(readFileSync(FILE, "utf8")) as Record<string, string>).filter(([, v]) => v.trim() !== "");
+// The worker's database address, when not filled in: Neon's direct address from the linked Vercel project.
+if (target === "github" && !all.some(([name]) => name === "DATABASE_URL")) {
+  const dir = mkdtempSync(path.join(tmpdir(), "evalhot-env-"));
+  try {
+    execFileSync(process.env.VERCEL_CLI || "vercel", ["env", "pull", path.join(dir, "env"), "--environment=production", "--yes"], { stdio: "ignore" });
+    const pulled = parseEnv(readFileSync(path.join(dir, "env"), "utf8")) as Record<string, string>;
+    const url = pulled.DATABASE_URL_UNPOOLED || pulled.POSTGRES_URL_NON_POOLING;
+    if (url) all.push(["DATABASE_URL", url]);
+  } catch {
+    // Not linked or not logged in: the check below names what is missing.
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+}
 const missing = REQUIRED[target].filter((k) => !all.some(([name]) => name === k));
 if (missing.length) {
   console.error(`${FILE} 里还没填：${missing.join("、")}`);
