@@ -17,7 +17,11 @@ const FILE = ".env.deploy";
 const WORKER = ["DATABASE_URL", "SITE_URL", "IMG_PROXY_SIGN_SECRET", "LLM_BASE_URL", "LLM_API_KEY", "LLM_MODEL", "LLM_EXTRA_JSON", "DASHSCOPE_API_KEY", "DASHSCOPE_BASE_URL"];
 /** On Vercel the Neon integration provides the database variables itself. */
 const NOT_ON_VERCEL = ["DATABASE_URL"];
-const REQUIRED = ["SITE_URL", "DATABASE_URL", "LLM_API_KEY", "LLM_MODEL"];
+/** The website runs without a model (only the worker calls one), so it can go up before the key is there. */
+const REQUIRED = {
+  vercel: ["SITE_URL", "ADMIN_PASSWORD", "SESSION_SECRET", "IMG_PROXY_SIGN_SECRET"],
+  github: ["SITE_URL", "DATABASE_URL", "IMG_PROXY_SIGN_SECRET", "LLM_API_KEY", "LLM_MODEL"],
+};
 
 const target = process.argv.includes("--vercel") ? "vercel" : process.argv.includes("--github") ? "github" : null;
 
@@ -60,12 +64,12 @@ MODEL_CALLS_ENABLED=true
 # 每个函数实例的数据库连接数（Neon 的连接数有上限）
 DATABASE_POOL_MAX=5
 `, { mode: 0o600 });
-  console.log(`已生成 ${FILE}：填上 SITE_URL、DATABASE_URL、LLM_API_KEY、LLM_MODEL、DASHSCOPE_API_KEY，再运行 --vercel 和 --github 上传。`);
+  console.log(`已生成 ${FILE}：网页只需要 SITE_URL（填好就能 --vercel 上传）；worker 还要 DATABASE_URL、LLM_API_KEY、LLM_MODEL、DASHSCOPE_API_KEY（填好再 --github）。`);
   process.exit(0);
 }
 
 const all = Object.entries(parseEnv(readFileSync(FILE, "utf8")) as Record<string, string>).filter(([, v]) => v.trim() !== "");
-const missing = REQUIRED.filter((k) => !all.some(([name]) => name === k));
+const missing = REQUIRED[target].filter((k) => !all.some(([name]) => name === k));
 if (missing.length) {
   console.error(`${FILE} 里还没填：${missing.join("、")}`);
   process.exit(1);

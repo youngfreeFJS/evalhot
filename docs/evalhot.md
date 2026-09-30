@@ -105,9 +105,9 @@ EvalHot 是用 [AIHOT 开源框架](https://github.com/KKKKhazix/AIHOT) 搭的 A
 
 ### 步骤
 
-1. 在 Vercel 导入这个 GitHub 仓库（Framework 选 Other，其余沿用 `vercel.json`），推送到默认分支就会自动部署。
+1. 在 Vercel 导入这个 GitHub 仓库：Application Preset 选 **Other**（Vercel 会因为看到 `apps/api` 和 `apps/web` 推荐 Services 多服务模式，不要选），Root Directory 保持 `./`，构建和安装命令沿用 `vercel.json`。推送到默认分支就会自动部署。第一次部署会因为还没接数据库而失败，接好 Neon 后重新部署即可。
 2. Vercel 项目 → Storage → 创建 Neon 数据库，区域选 **US East (N. Virginia)**，连接到这个项目。
-3. 生成并填写配置，分别上传到 Vercel 和 GitHub：
+3. 生成并填写配置，分别上传到 Vercel 和 GitHub。网页不需要模型，填好 `SITE_URL` 就能先上传 `--vercel`；worker 还要数据库地址和模型 key，齐了再上传 `--github`：
 
    ```bash
    node scripts/deploy-env.ts            # 生成 .env.deploy（只在本机，已被 gitignore）
